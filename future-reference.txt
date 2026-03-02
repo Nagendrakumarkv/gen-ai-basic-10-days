@@ -1,0 +1,228 @@
+Becoming a Generative AI Developer in 10 days is an aggressive goal. To make this feasible, you must shift your mindset from "Learning Theory" to "Building Applications." You cannot become a researcher (creating models like GPT-4) in 10 days, but you can become an engineer who builds powerful apps on top of these models.
+
+Prerequisite: This plan assumes you already know Python. If you don't, you must learn Python basics first.
+
+Here is your high-intensity "Zero to Builder" 10-Day Bootcamp.
+
+The Stack (2026 Standard)
+Don't waste time choosing tools. Use this standard, modern stack:
+
+Language: Python
+
+Orchestration: LangChain or LlamaIndex
+
+Models (LLMs): OpenAI API (GPT-4o), Anthropic (Claude 3.5), or Google Gemini API.
+
+Vector Database: Pinecone or ChromaDB.
+
+Frontend: Streamlit (fastest for Python devs).
+
+IDE: Cursor (VS Code fork with built-in AI) – Crucial for speed.
+
+Phase 1: The Foundation (Days 1-3)
+Goal: Understand how to talk to models and manipulate their outputs programmatically.
+
+Day 1: APIs & Prompt Engineering
+Stop using ChatGPT via the web interface. Start using it via code.
+
+Concept: Tokens, Context Windows, Temperature, System vs. User roles.
+
+Task: Get an API Key (OpenAI or Gemini). Write a Python script to send a prompt and print the response.
+
+Project: Build a "CLI Summarizer". A script where you paste a long text, and it returns 3 bullet points.
+
+Key Library: openai (Python SDK), google-generativeai.
+
+Day 2: Chains & Orchestration (LangChain)
+Raw APIs are messy. You need a framework to glue things together.
+
+Concept: Chains (Output of step A = Input of step B).
+
+Task: Install langchain. Learn PromptTemplate and LLMChain.
+
+Project: Build a "YouTube Title Generator".
+
+Step 1: User inputs a topic (e.g., "Cooking").
+
+Step 2: LLM generates 5 video ideas.
+
+Step 3: LLM takes the best idea and writes a script outline.
+
+Chain them together automatically.
+
+Day 3: RAG (Retrieval Augmented Generation)
+This is the single most important skill for a GenAI developer in 2026. It stops the AI from hallucinating by giving it your own data.
+
+Concept: Embeddings (turning text into numbers), Vector Search.
+
+Task: Learn how to chunk text and create embeddings using OpenAIEmbeddings.
+
+Project: "Chat with your PDF".
+
+Take a PDF document.
+
+Split it into chunks.
+
+Store chunks in a local Vector Store (ChromaDB or FAISS).
+
+When you ask a question, the code finds the relevant chunk and sends it to the LLM to answer.
+
+Phase 2: Advanced Logic (Days 4-6)
+Goal: Move from simple "Question/Answer" to "Reasoning/Acting."
+
+Day 4: Memory & Chat History
+LLMs are stateless (they forget you immediately). You must engineer memory.
+
+Concept: Short-term memory, Window memory, Summary memory.
+
+Task: Implement ConversationBufferMemory in LangChain.
+
+Project: Build a "Personal Therapist Bot". It must remember your name and what you told it 5 messages ago.
+
+Day 5: AI Agents (The 2026 Frontier)
+Agents use LLMs to decide what tools to use. This is the difference between a chatbot and an assistant.
+
+Concept: ReAct (Reasoning + Acting), Tools (Google Search, Calculator, API calls).
+
+Task: Use LangGraph or LangChain Agents. Give the agent access to a "Google Search" tool (SerpApi).
+
+Project: Build a "Market Research Agent".
+
+You ask: "Should I buy Apple stock?"
+
+Agent thinks: "I need current prices." -> Searches Google. -> "I need news." -> Searches News. -> Synthesizes answer.
+
+Day 6: Image & Multimodal Generation
+Text is only half the battle.
+
+Concept: Text-to-Image (Diffusion models), Multimodal inputs (Image-to-Text).
+
+Task: Use the Stability AI API or DALL-E 3 API.
+
+Project: "Instagram Caption & Image Generator".
+
+User inputs: "A cyberpunk city."
+
+App generates an image.
+
+App sends that image back to a Vision LLM (like GPT-4 Vision) to write a witty caption for it.
+
+Phase 3: The Capstone & Deployment (Days 7-10)
+Goal: Build something real and put it on the internet.
+
+Day 7: Fine-Tuning (The 1% Skill)
+Most devs only use RAG. Knowing when to Fine-Tune sets you apart.
+
+Concept: Pre-training vs. Fine-tuning vs. RAG. PEFT (Parameter-Efficient Fine-Tuning) / LoRA.
+
+Task: Don't train a model. Just run through a tutorial on Hugging Face Autotrain or OpenAI's fine-tuning UI to understand the JSONL data format required.
+
+Goal: Understand how to format data to teach a model a specific "tone" or "style."
+
+Day 8: Backend & Frontend Integration
+Stop running scripts in the terminal.
+
+Tools: Streamlit (Frontend) + FastAPI (Backend - optional, but good).
+
+Task: Wrap your "Chat with PDF" code (Day 3) into a clean web interface using Streamlit.
+
+Result: A URL you can open in a browser with a text box and a "Send" button.
+
+Day 9: The Capstone Project
+Build a "Full Stack GenAI SaaS MVP".
+
+Idea: "Resume Roaster & Fixer".
+
+Input: User uploads PDF Resume + Job Description URL.
+
+Agent Action: Scrapes the Job Description.
+
+RAG: Reads the Resume.
+
+Output: Gives a score (0-100), roasts the bad parts, and rewrites the bullet points to match the job description.
+
+Focus: Spend all day coding this. Use Cursor/Copilot to write the boilerplate code fast.
+
+Day 10: Deployment & Optimization
+If it's local, it doesn't count.
+
+Task: Push your code to GitHub. Deploy the Streamlit app to Streamlit Community Cloud (free) or Vercel.
+
+Optimization: Add a "System Prompt" to make the AI behave consistently. Add error handling (what if the API fails?).
+
+Deliverable: A live link you can put on LinkedIn.
+
+How to actually succeed in 10 days
+Don't read textbooks. If you are reading about the math of "Backpropagation," you have failed. You are a driver, not a mechanic.
+
+Code with AI. Use Cursor (IDE). It allows you to highlight code and ask "How do I add a memory buffer to this?" It will teach you faster than any video.
+
+Stick to one path. Do not try to learn PyTorch, TensorFlow, AND JAX. Just stick to LangChain + OpenAI/Gemini for these 10 days.
+
+Would you like me to generate the starter code for Day 1 (The CLI Summarizer) so you can start immediately?
+
+---------------------------------------------------------------------------------------------------
+
+Day 1: APIs & Prompt Engineering
+
+Love the bias for action. You're skipping the web UI and going straight to the code—this is exactly how you become a builder.Google recently released a new, unified SDK called google-genai (replacing the older google-generativeai you mentioned). We are going to use the new one because it is cleaner, faster, and the modern standard.Here is your battle plan for Day 1.Step 1: Environment SetupFirst, let's isolate your project so your dependencies don't clash with other Python projects on your machine. Open your terminal and run these commands:For macOS/Linux:Bash# Create the virtual environment
+python3 -m venv venv
+
+# Activate it
+source venv/bin/activate
+For Windows:PowerShell# Create the virtual environment
+python -m venv venv
+
+# Activate it
+.\venv\Scripts\activate
+(You should now see (venv) at the beginning of your terminal prompt. If you don't, stop and fix this before moving on).Step 2: Install the StackWe need two packages: the Gemini SDK, and python-dotenv to securely manage our API key so we don't accidentally upload it to GitHub.Bashpip install google-genai python-dotenv
+Step 3: Get Your API KeyGo to Google AI Studio (aistudio.google.com).Sign in with your Google account.Click "Get API key" in the top left corner and create a new key.Create a file in your project folder named .env (just .env, no filename before the dot) and paste your key inside like this:Code snippetGEMINI_API_KEY=your_actual_api_key_here
+Step 4: The Code (CLI Summarizer)Create a file named summarizer.py and paste the code below.Notice how we use System Instructions to strictly enforce the "3 bullet points" rule, and we lower the Temperature to $0.3$ to make the AI's output more focused and less "creative" (which is exactly what you want for a summarizer).Pythonimport os
+import sys
+from dotenv import load_dotenv
+from google import genai
+from google.genai import types
+
+# 1. Load the API key from the .env file
+load_dotenv()
+
+# 2. Initialize the Gemini Client
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
+def summarize_text(text):
+    print("\n[AI is thinking...]\n")
+    
+    # 3. Call the model
+    # We use gemini-2.5-flash because it is lightning-fast and perfect for text tasks
+    response = client.models.generate_content(
+        model='gemini-2.5-flash',
+        contents=text,
+        config=types.GenerateContentConfig(
+            system_instruction="You are an expert summarizer. Summarize the user's text into exactly 3 concise bullet points. Do not include any intro or outro text.",
+            temperature=0.3, # Low temperature = more focused, less hallucination
+        )
+    )
+    
+    return response.text
+
+if __name__ == "__main__":
+    print("=== The 3-Bullet CLI Summarizer ===")
+    print("Paste your long text below.")
+    print("When done, press Enter, then Ctrl-D (Mac/Linux) or Ctrl-Z (Windows), then Enter:")
+    
+    # We use sys.stdin.read() so you can paste multiple paragraphs at once without breaking the script
+    user_input = sys.stdin.read()
+    
+    if user_input.strip():
+        summary = summarize_text(user_input)
+        print("=== SUMMARY ===")
+        print(summary)
+        print("\n=================")
+    else:
+        print("No text provided. Exiting.")
+Step 5: Run ItIn your terminal (make sure your venv is still active), run:Bashpython summarizer.py
+Paste a massive Wikipedia article or a long email, trigger the EOF signal (Ctrl-D or Ctrl-Z), and watch the API do the heavy lifting.Day 1 complete. You now know how to authenticate, configure system prompts, adjust temperature, and programmatically manipulate an LLM.Would you like to test this out first, or are you ready to jump straight into Day 2 and learn how to chain models together using LangChain?
+
+------------------------------------------------------------------------------------------------
+
+Day 2: Chains & Orchestration (LangChain)

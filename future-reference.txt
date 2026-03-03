@@ -226,3 +226,113 @@ Paste a massive Wikipedia article or a long email, trigger the EOF signal (Ctrl-
 ------------------------------------------------------------------------------------------------
 
 Day 2: Chains & Orchestration (LangChain)
+
+Welcome to Day 2! You survived the raw API phase. Now, we are going to give you superpowers by gluing these AI calls together.
+
+Before we write code, I need to give you a quick 2026 Reality Check: You mentioned LLMChain. In the modern LangChain ecosystem, LLMChain is considered legacy/outdated. Today, professional developers use LCEL (LangChain Expression Language).
+
+LCEL uses the pipe operator (|), similar to Linux/Unix, to pass data seamlessly from one step to the next. It is much cleaner, faster, and easier to debug. We are going to use the modern standard.
+
+Here is your battle plan for Day 2.
+
+Step 1: Install LangChain & the Gemini Integration
+Make sure your virtual environment (venv) is still activated from yesterday. We need to install LangChain and its official Google integration package.
+
+Run this in your terminal:
+
+Bash
+pip install langchain langchain-google-genai langchain-core
+Step 2: The Core Concepts
+Instead of just sending a raw string to the AI, we use three building blocks:
+
+PromptTemplate: A "fill-in-the-blank" template for your prompts (like string interpolation, but built for AI).
+
+LLM: The model itself (Gemini).
+
+Output Parser: A tool that cleans up the AI's response (e.g., stripping out weird formatting or converting it into a clean Python string).
+
+When we combine them using LCEL, it looks like this: Chain = Prompt | LLM | Parser.
+
+Step 3: The Code (YouTube Pipeline)
+Create a new file named youtube_generator.py. Make sure your .env file from Day 1 is still in the same folder.
+
+In this script, we will build two chains and run them sequentially.
+
+Python
+import os
+from dotenv import load_dotenv
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import PromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+
+# 1. Load the API key
+load_dotenv()
+
+# 2. Initialize the modern LangChain Gemini model
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash", 
+    temperature=0.7, # Higher temperature for more creative video ideas
+    google_api_key=os.getenv("GEMINI_API_KEY")
+)
+
+# --- CHAIN 1: The Title Generator ---
+title_template = """
+You are an expert YouTube strategist.
+Given the topic: {topic}
+Generate exactly 5 highly engaging, click-worthy YouTube video titles.
+Return ONLY the titles, one per line.
+"""
+title_prompt = PromptTemplate.from_template(title_template)
+
+# LCEL: Prompt -> Model -> Clean String Output
+title_chain = title_prompt | llm | StrOutputParser()
+
+
+# --- CHAIN 2: The Script Outline Generator ---
+outline_template = """
+You are an expert YouTube scriptwriter.
+Here are 5 video ideas:
+{titles}
+
+Task:
+1. Pick the absolute best, most viral title from that list.
+2. Write a brief, high-energy 3-part script outline (Hook, Body, Call to Action) for that specific title.
+Make sure to state which title you chose at the very top.
+"""
+outline_prompt = PromptTemplate.from_template(outline_template)
+
+# LCEL: Prompt -> Model -> Clean String Output
+outline_chain = outline_prompt | llm | StrOutputParser()
+
+
+# --- EXECUTE THE PIPELINE ---
+if __name__ == "__main__":
+    print("=== Automated YouTube Pipeline ===")
+    user_topic = input("Enter a YouTube topic (e.g., 'Healthy Cooking', 'Python for Beginners'): ")
+    
+    print("\n[1/2] Brainstorming 5 viral titles...")
+    # We pass the user_topic into the first chain
+    generated_titles = title_chain.invoke({"topic": user_topic})
+    
+    print("\n--- Generated Titles ---")
+    print(generated_titles)
+    
+    print("\n[2/2] Choosing the best title and writing an outline...")
+    # We pass the output of Chain 1 (generated_titles) into Chain 2
+    script_outline = outline_chain.invoke({"titles": generated_titles})
+    
+    print("\n--- Final Script Outline ---")
+    print(script_outline)
+    print("\n===================================")
+Step 4: Run It
+In your terminal, execute the script:
+
+Bash
+python youtube_generator.py
+Type in a topic like "Budget Travel in Japan" or "How to fix a leaky faucet" and watch the orchestration happen. You will see the AI hand off the output of the first task directly into the input of the second task.
+
+Were you able to get the pipeline running, or did you hit any errors? Let me know so we can debug, or tell me when you're ready to tackle the holy grail of GenAI: Day 3 (RAG).
+
+-------------------------------------------------------------------------------------------------
+
+Day 3: RAG (Retrieval Augmented Generation)

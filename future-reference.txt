@@ -777,7 +777,112 @@ When you run this, there will be a slight delay. That delay is the agent literal
 Did it successfully pull today's real-time data? Once you verify your agent can touch the internet, let me know and we will move to Day 6: Image & Multimodal Generation.
 
 -----------------------------------------------------------------------------------------------------
+Day 7: Fine-Tuning (The 1% Skill)
 
+Welcome to Day 7! You are entering the top 1% of GenAI developers today.
 
+Most beginners try to use RAG to fix everything. But RAG is only meant to give the AI new facts. If you want the AI to speak in a highly specific tone, format outputs in a strict custom JSON structure, or learn a specific coding language, RAG will fail. You need Fine-Tuning.
 
+[Image explaining the difference between RAG Retrieval Augmented Generation and LLM Fine Tuning]
 
+Here is your 2026 Reality Check for today: Training an AI from scratch (Pre-training) costs millions of dollars. Full fine-tuning (updating every single parameter) is also insanely expensive. Today, the industry standard is PEFT (Parameter-Efficient Fine-Tuning), specifically a technique called LoRA (Low-Rank Adaptation).
+
+Think of it like this: Instead of rewriting the AI's entire brain, LoRA freezes the brain and just "tapes" a tiny, lightweight USB drive of new behaviors to the side of it. It’s cheap, fast, and you can run it on a normal computer.
+
+Since we aren't burning GPU hours today, we are going to master the hardest part of fine-tuning: Data Preparation.
+
+Step 1: The Golden Rule of Fine-Tuning
+Before you write code, you must memorize this:
+
+Prompt Engineering: You give the model 1 to 5 examples in the prompt (Few-Shot).
+
+Fine-Tuning: You give the model 50 to 5,000 examples in a training file.
+
+Step 2: The JSONL Format
+To fine-tune a modern chat model (like Gemini, Claude, or GPT), you cannot just upload a Word document. You must format your data as a .jsonl (JSON Lines) file.
+
+A JSONL file contains multiple JSON objects.
+
+Crucial difference: There are NO commas between the objects, and the whole file is NOT wrapped in a giant list []. Each line is its own isolated, valid JSON object.
+
+Here is what a single line of training data looks like for a "Sarcastic Customer Service Bot":
+
+JSON
+{"messages": [{"role": "system", "content": "You are a sarcastic customer support agent."}, {"role": "user", "content": "How do I reset my password?"}, {"role": "model", "content": "Have you tried looking at the giant 'Forgot Password' button right next to the login field? Just a thought."}]}
+Step 3: The Code (Synthetic Data Generator)
+Nobody writes 500 examples by hand. Modern AI engineers use big, smart models (like Gemini 2.5 Flash) to generate .jsonl training data to fine-tune smaller, cheaper models.
+
+Create a file named generate_dataset.py. We will use your existing Gemini API key to generate a perfectly formatted JSONL training file.
+
+Python
+import os
+import json
+from dotenv import load_dotenv
+from google import genai
+
+# 1. Load API Key
+load_dotenv()
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+
+def create_training_data():
+    print("=== JSONL Training Data Generator ===")
+    print("Generating 3 synthetic examples... (In reality, you'd loop this to make 100+)\n")
+    
+    # We ask Gemini to invent customer queries and sarcastic responses
+    prompt = """
+    Generate 3 distinct examples of a user asking a generic customer service question, 
+    and a highly sarcastic, dry response from the agent.
+    
+    Output ONLY valid JSON in this exact format, with no markdown formatting or code blocks:
+    [
+      {"user": "question here", "agent": "sarcastic response here"}
+    ]
+    """
+    
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents=prompt,
+    )
+    
+    # Clean the output and parse the JSON
+    raw_text = response.text.replace('```json', '').replace('```', '').strip()
+    
+    try:
+        synthetic_examples = json.loads(raw_text)
+    except json.JSONDecodeError:
+        print("❌ Error: AI didn't return perfect JSON. Try running it again.")
+        return
+        
+    # --- WRITE TO JSONL ---
+    output_filename = "sarcastic_bot_training.jsonl"
+    
+    with open(output_filename, "w", encoding="utf-8") as f:
+        for example in synthetic_examples:
+            # We map the AI's generation into the strict fine-tuning format
+            training_row = {
+                "messages": [
+                    {"role": "system", "content": "You are a sarcastic customer support agent."},
+                    {"role": "user", "content": example["user"]},
+                    {"role": "model", "content": example["agent"]}
+                ]
+            }
+            # Write exactly one JSON object per line, followed by a newline
+            f.write(json.dumps(training_row) + "\n")
+            
+    print(f"✅ Successfully created '{output_filename}'!")
+    print("Open the file in your code editor to see the exact format required for Fine-Tuning.")
+
+if __name__ == "__main__":
+    create_training_data()
+Step 4: Run it!
+Run the script in your terminal:
+
+Bash
+python generate_dataset.py
+After it runs, open the newly created sarcastic_bot_training.jsonl file in your code editor. If you were doing this for real, you would generate 100 of these rows, go to the Google AI Studio or OpenAI dashboard, click "Fine-Tune," and drag-and-drop this exact file.
+
+Run the script and inspect the JSONL file. Did it format correctly? If you understand how this file works, you understand fine-tuning prep. Are you ready for Day 8: Backend & Frontend Integration?
+
+---------------------------------------------------------------------------------------------------
+
+Day 8: Backend & Frontend Integration

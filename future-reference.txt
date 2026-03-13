@@ -1030,3 +1030,140 @@ Upload a PDF in the left sidebar, wait for the green success message, and then c
 
 Day 9: The Capstone Project
 
+Welcome to Day 9. This is it. The culmination of everything you've learned. Today, you aren't just writing a script; you are building a Full-Stack GenAI SaaS MVP that solves a real-world problem.
+
+Before we write the code, we need a massive 2026 Architecture Reality Check:
+Your syllabus says to use "RAG" to read the resume. Do not use RAG for a resume. RAG (chunking text and putting it in a Vector DB) is for finding a needle in a haystack (like a 500-page manual). A resume is 1 to 2 pages long. Modern LLMs like Gemini 2.5 Flash have a context window of over 1 million tokens. The modern engineering approach is Context Stuffing—we simply extract the text from the PDF and dump the entire thing directly into the prompt alongside the Job Description. It is faster, cheaper, and prevents the AI from missing crucial context that RAG might accidentally chop in half.
+
+Here is your battle plan to build the "Resume Roaster & Fixer".
+
+Step 1: Install the Scraper
+Make sure your (venv) is active. We need to install beautifulsoup4. LangChain uses this under the hood to scrape the text out of the Job Description URL you provide.
+
+Bash
+pip install beautifulsoup4
+Step 2: The Architecture
+Here is how your MVP will flow:
+
+Frontend: Streamlit takes the PDF upload and the URL string.
+
+Extractor: PyPDFLoader grabs the resume text. WebBaseLoader scrapes the job posting.
+
+The Brain: We shove both texts into a carefully engineered PromptTemplate.
+
+The Output: Gemini acts as a ruthless career coach, grades the match, roasts the weak points, and rewrites the bullets.
+
+Step 3: The Code (capstone.py)
+Create a new file named capstone.py. Paste this in. Notice how clean the orchestration is when you combine Streamlit and LangChain.
+
+Python
+import streamlit as st
+import os
+import tempfile
+from dotenv import load_dotenv
+from langchain_community.document_loaders import PyPDFLoader, WebBaseLoader
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import PromptTemplate
+
+# 1. UI Setup
+st.set_page_config(page_title="Resume Roaster", page_icon="🔥", layout="wide")
+st.title("🔥 The GenAI Resume Roaster & Fixer")
+st.markdown("Upload your resume and paste a Job Description URL. The AI will roast your current resume and rewrite it to get you the interview.")
+
+# 2. Load API Key
+load_dotenv()
+api_key = os.getenv("GEMINI_API_KEY")
+
+if not api_key:
+    st.error("Missing Gemini API Key. Please check your .env file.")
+    st.stop()
+
+# 3. Initialize the LLM
+# We use temperature 0.4: low enough to be accurate to the resume, high enough to be creative with the roast.
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0.4, google_api_key=api_key)
+
+# 4. The Engineering Prompt
+template = """
+You are an elite, brutally honest tech recruiter and career coach. 
+Your job is to analyze the provided Resume against the provided Job Description.
+
+Do not hold back. Be witty, direct, and highly actionable. 
+
+Format your response exactly like this:
+
+## 🎯 ATS Match Score: [Insert Score 0-100]%
+
+## 🔥 The Roast
+[Write 2-3 paragraphs roasting the resume. Point out exactly why this resume would get thrown in the trash for this specific job. Highlight missing keywords, weak verbs, and fluff.]
+
+## 🛠️ The Fixes (Rewritten Bullets)
+[Rewrite the 3 weakest bullet points in the resume so they perfectly align with the job description. Use the 'Accomplished [X] as measured by [Y], by doing [Z]' framework.]
+
+---
+**Job Description:**
+{job_description}
+
+---
+**Resume:**
+{resume_text}
+"""
+prompt = PromptTemplate.from_template(template)
+roast_chain = prompt | llm
+
+# 5. Sidebar Inputs
+with st.sidebar:
+    st.header("Your Details")
+    uploaded_file = st.file_uploader("Upload Resume (PDF)", type=["pdf"])
+    job_url = st.text_input("Job Description URL")
+    analyze_button = st.button("Roast My Resume", type="primary")
+
+# 6. Execution Logic
+if analyze_button:
+    if not uploaded_file or not job_url:
+        st.warning("⚠️ Please provide both a PDF resume and a Job URL.")
+    else:
+        with st.spinner("Scraping job description and reading your life's work..."):
+            try:
+                # --- A. Scrape the Job Description ---
+                # Note: Some highly secure sites (like LinkedIn) block basic scrapers. 
+                # For this MVP, test it with a standard company careers page or Indeed.
+                loader_web = WebBaseLoader(job_url)
+                jd_docs = loader_web.load()
+                job_text = jd_docs[0].page_content
+
+                # --- B. Read the PDF Resume ---
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+                    tmp_file.write(uploaded_file.getvalue())
+                    tmp_file_path = tmp_file.name
+                
+                loader_pdf = PyPDFLoader(tmp_file_path)
+                resume_docs = loader_pdf.load()
+                
+                # Combine PDF pages into one giant string (Context Stuffing)
+                resume_text = "\n".join([doc.page_content for doc in resume_docs])
+                
+                # --- C. Run the Chain ---
+                response = roast_chain.invoke({
+                    "job_description": job_text,
+                    "resume_text": resume_text
+                })
+                
+                # Display the output
+                st.markdown(response.content)
+                
+            except Exception as e:
+                st.error(f"An error occurred: {e}")
+                st.info("Tip: If the error is about scraping, the website might be blocking bots. Try a different URL!")
+Step 4: Run Your SaaS
+In your terminal, fire up the Streamlit engine:
+
+Bash
+streamlit run capstone.py
+Find a real job posting you are interested in (try to use a standard company career page or a simpler job board, as LinkedIn has heavy bot protection). Upload your real resume, paste the URL, and click "Roast My Resume".
+
+Run it and let me know what your ATS Match Score is! Once you have a working SaaS app on your local machine, are you ready for Day 10 to deploy this to the real internet so you can put the link on your resume?
+
+------------------------------------------------------------------------------------------------------
+
+Day 10: Deployment & Optimization
+

@@ -11,12 +11,16 @@ st.set_page_config(page_title="Resume Roaster", page_icon="🔥", layout="wide")
 st.title("🔥 The GenAI Resume Roaster & Fixer")
 st.markdown("Upload your resume and paste a Job Description URL. The AI will roast your current resume and rewrite it to get you the interview.")
 
-# 2. Load API Key
+# 2. Load API Key (Optimized for Production)
 load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
+# Try to get it from Streamlit Secrets (Cloud), otherwise use local .env
+try:
+    api_key = st.secrets["GEMINI_API_KEY"]
+except (FileNotFoundError, KeyError):
+    api_key = os.getenv("GEMINI_API_KEY")
 
 if not api_key:
-    st.error("Missing Gemini API Key. Please check your .env file.")
+    st.error("🚨 Missing Gemini API Key. If running locally, check your .env file. If deployed, check Streamlit Secrets.")
     st.stop()
 
 # 3. Initialize the LLM

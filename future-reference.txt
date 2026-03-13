@@ -1167,3 +1167,112 @@ Run it and let me know what your ATS Match Score is! Once you have a working Saa
 
 Day 10: Deployment & Optimization
 
+Welcome to Day 10. The finish line.
+
+"If it's local, it doesn't count." This is the truest statement in software engineering. Today, you cross the chasm from "tutorial follower" to "shipped developer." By the end of this hour, you will have a public URL to share on LinkedIn, putting you ahead of 99% of people who just talk about AI.
+
+To do this, we are going to use Streamlit Community Cloud. It is 100% free, hosts your app directly from your GitHub repository, and automatically updates whenever you push new code.
+
+Here is your final battle plan.
+
+Step 1: The Production-Ready Code
+When you deploy to the cloud, your app can't read your local .env file (because we purposefully hid it with .gitignore on Day 1!). Streamlit uses something called Secrets Management.
+
+Open your capstone.py file and replace the API loading section (around line 14) with this optimized version. This code checks Streamlit Secrets first (for production), and falls back to your local .env file (for testing).
+
+Python
+# ... (imports stay the same) ...
+
+# 2. Load API Key (Optimized for Production)
+load_dotenv()
+# Try to get it from Streamlit Secrets (Cloud), otherwise use local .env
+try:
+    api_key = st.secrets["GEMINI_API_KEY"]
+except (FileNotFoundError, KeyError):
+    api_key = os.getenv("GEMINI_API_KEY")
+
+if not api_key:
+    st.error("🚨 Missing Gemini API Key. If running locally, check your .env file. If deployed, check Streamlit Secrets.")
+    st.stop()
+
+# ... (rest of your code stays exactly the same) ...
+Step 2: Create the requirements.txt File
+When Streamlit Cloud boots up a fresh Linux server for your app, it has no idea what packages you used. You have to tell it.
+
+Create a new file in your project folder named exactly requirements.txt and paste this inside:
+
+Plaintext
+streamlit
+langchain-google-genai
+langchain-community
+pypdf
+beautifulsoup4
+python-dotenv
+Step 3: Push to GitHub
+Your code needs to be on the internet before Streamlit can host it.
+
+Go to GitHub.com and create a new public repository called resume-roaster-ai. Leave the "Initialize with README" box unchecked.
+
+Open your terminal (ensure your venv is active and you are in your project folder).
+
+Run these exact commands (replace YOUR_GITHUB_USERNAME with your actual username):
+
+Bash
+# Initialize git if you haven't already
+git init
+
+# Make absolutely sure your .env is ignored!
+echo ".env" >> .gitignore
+
+# Stage and commit your files
+git add .
+git commit -m "V1: Production Ready SaaS MVP"
+
+# Connect to your new GitHub repo and push
+git branch -M main
+git remote add origin https://github.com/YOUR_GITHUB_USERNAME/resume-roaster-ai.git
+git push -u origin main
+Step 4: Deploy to Streamlit Cloud
+Now for the magic.
+
+Go to share.streamlit.io and sign in with your GitHub account.
+
+Click the "New app" button.
+
+If prompted, authorize Streamlit to access your GitHub repositories.
+
+Fill out the deployment form:
+
+Repository: Select your resume-roaster-ai repo.
+
+Branch: main
+
+Main file path: capstone.py
+
+App URL: Customize this to something cool like yourname-resume-roaster!
+
+STOP! Do not click "Deploy" yet.
+
+Step 5: The Secret Sauce (Cloud API Key)
+If you deploy now, the app will crash because it doesn't have your Gemini API key.
+
+On that same deployment screen, click "Advanced settings" (usually near the bottom).
+
+A text box titled "Secrets" will pop up.
+
+Type your API key exactly like this:
+
+Ini, TOML
+GEMINI_API_KEY="AIzaSyYourActualKeyHere..."
+Click Save, and then click Deploy!
+
+The Finish Line
+You will see a terminal screen on Streamlit as it builds your server, installs your requirements.txt, and boots up your app. In about 2-3 minutes, your app will go live.
+
+Congratulations. Ten days ago, you were typing prompts into a web UI. Today, you are a Full-Stack Generative AI Developer with a live, autonomous agent deployed to the cloud. You understand APIs, LangChain orchestration, RAG, memory, multi-modal vision, and parameter-efficient fine-tuning architecture.
+
+Drop the live Streamlit URL here when it finishes building! I want to see your SaaS in action.
+
+------------------------------------------------------------------------------------------------------------
+                                      THANK YOU
+------------------------------------------------------------------------------------------------------------

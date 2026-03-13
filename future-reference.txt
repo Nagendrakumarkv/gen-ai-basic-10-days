@@ -1275,7 +1275,7 @@ Drop the live Streamlit URL here when it finishes building! I want to see your S
 
 -----------------------------------------------------------------------------------------------------------
 
-APP URL : https://resume-analyser-with-job-description.streamlit.app/
+Website URL : https://resume-analyser-with-job-description.streamlit.app/
 
 ------------------------------------------------------------------------------------------------------------
                                       THANK YOU
